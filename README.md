@@ -45,6 +45,7 @@ I have a neural network class.
 The class has various properties:  
 
 | Property        | What is it                                                               |
+| :---            | :---:                                                                    |
 | inputLayerSize  | The size of the input layer of the neural net                            |
 | outputLayerSize | The size of the outputlayer of the neural net                            |
 | hiddenLayerSize | The size of the hidden layer of the neural net                           |
