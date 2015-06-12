@@ -66,10 +66,11 @@ yHat is returned.
 
 
 The sigmoid function is:  
-'''def sigmoid(self, z):
-       # Apply sigmoid activation function
-       return 1 / (1 + np.exp(-z))
-       '''
+```python
+def sigmoid(self, z):
+    # Apply sigmoid activation function
+    return 1 / (1 + np.exp(-z))
+```
 
 This results in a value between 0 and 1.   
 If the value is between 0.4 and 0.6, the paddle stays where it is.  
