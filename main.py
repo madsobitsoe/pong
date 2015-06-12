@@ -1,7 +1,9 @@
 import pygame
-
+import numpy as np
 from random import randint
 
+'''
+# Code to load png's
 def load_png(name):
     # Load image and return image object
     fullname = os.path.join('res', name)
@@ -15,6 +17,52 @@ def load_png(name):
         print 'cannot load image:', fullname
         raise SystemExit, message
     return image, image.get_rect()
+'''
+
+# The neural network class
+
+class Neural_Network(object):
+    def __init__(self):
+        # Define Hyperparameters
+        self.inputLayerSize = 2
+        self.outputLayerSize = 1
+        self.hiddenLayerSize = 3
+
+        # Weights (parameters)
+        # Layer 1 weights
+        self.W1 = np.random.randn(self.inputLayerSize, self.hiddenLayerSize)
+
+        # Layer 2 weights
+        self.W2 = np.random.randn(self.hiddenLayerSize, self.outputLayerSize)
+ 
+    def forward(self, X):
+        # Normalize 
+  #      X = X / np.amax(X, axis=0)
+#        print 'X is: ' + str(X)
+
+        # Propagate inputs through network
+        # Layer 2 activities
+        self.z2 = np.dot(X, self.W1)
+        # Layer 2 activations
+  #      print 'This is z2:'
+   #     print self.z2
+        self.a2 = self.sigmoid(self.z2)
+#        print 'This is a2:'
+ #       print self.a2
+        # Layer 3 activations
+        # This is where the outputs of the hidden layer are squashed together
+        self.z3 = np.dot(self.a2, self.W2)
+        # Predicted score
+        # This runs the sigmoid activation function on z3 and saves it in yHat
+        yHat = self.sigmoid(self.z3)
+        return yHat
+
+            
+    def sigmoid(self, z):
+        # Apply sigmoid activation function
+        return 1 / (1 + np.exp(-z))
+
+
 
 class Player():
     def __init__(self, width, height):
@@ -35,6 +83,53 @@ class Player():
         else:
             self.y = coords[1]
 
+
+
+class NeuralNetPlayer():
+    def __init__(self, width, height, neuralNet):
+        self.x = width - 100
+        self.y = height / 2
+        self.height = 80
+        self.width = 20
+        self.neuralNet = neuralNet
+
+        
+        
+        # The bat needs to go up, stay put or go down.
+        # -1 is up, 0 is stay and 1 is down
+        self.currentAction = 0
+        # The amount of pixels to move by each update
+        self.moveLength = 5
+        
+    def draw(self, display_surf):
+        pygame.draw.rect(display_surf, (255, 255, 255), (self.x, self.y, self.width, self.height))
+        
+    def update(self, height, ballY, ballX):
+
+        # Calculate action with network
+        print ballY, ballX
+        print self.height
+        self.currentAction = self.neuralNet.forward(np.array(([ballY - self.y, ballX]), dtype=float)) 
+        print 'Current action: ' + str(self.currentAction)
+        
+        
+        if self.y <= 0:
+            self.y = 0
+            print 'fucccck'
+        if self.y >= height - self.height:
+            self.y = height - self.height - 5
+        else:
+            if self.currentAction < 0.4:
+                self.currentAction = -1
+            if self.currentAction > 0.6:
+                self.currentAction = 1
+            if self.currentAction >= 0.4 and self.currentAction <= 0.6:
+                self.currentAction = 0    
+
+            self.y += self.currentAction * self.moveLength
+
+
+            
 class Opponent():
     def __init__(self, width, height):
         self.x = 100
@@ -68,6 +163,7 @@ class Opponent():
             self.y = 0
         if self.y + self.height > height:
             self.y = height - self.height
+
 class Ball():
     def __init__(self):
         self.x = 320
@@ -97,7 +193,7 @@ class Ball():
 
     def check_bounds(self, width, height):
         # Check left boundary
-        if self.x - self.radius <= 0:
+        if self.x - self.radius <= 10:
             self.player_scored = True
         # Check right boundary
         if self.x + self.radius >= width:
@@ -172,16 +268,16 @@ class Main():
     def draw_score(self):
         score1 = self.font.render(str(self.opponent_points), True, (255, 255, 255))
         score2 = self.font.render(str(self.player_points), True, (255, 255, 255))
-#        movetimer = self.font.render(str(self.opponent.move_timer), True, (255, 255, 255))
+        movetimer = self.font.render(str(self.opponent.move_timer), True, (255, 255, 255))
         self.display_surf.blit(score1, (10, 10))
         self.display_surf.blit(score2, (600, 10))
-#        self.display_surf.blit(movetimer, (10, 50))
+        self.display_surf.blit(movetimer, (10, 50))
 
     def update_world(self):
         self.ball.check_bounds(self.width, self.height)
         self.ball.checkBat(self.opponent, self.player)
         self.ball.move()
-        self.player.update(self.height)
+        self.player.update(self.height, self.ball.y, self.ball.x)
         self.opponent.update(self.ball.y, self.height)
         self.opponent.move()
         self.update_score()
@@ -198,7 +294,8 @@ class Main():
     def on_execute(self):
         if self.on_init() == False:
             self.running = False
-        self.player = Player(self.width, self.height)
+#        self.player = Player(self.width, self.height)
+        self.player = NeuralNetPlayer(self.width, self.height, Neural_Network())
         self.opponent = Opponent(self.width, self.height)
         self.ball = Ball()
 
@@ -206,6 +303,10 @@ class Main():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.QUIT()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        self.player.neuralNet = Neural_Network()
+                        print 'new NN created for player'
             self.update_world()
             self.render()
             
