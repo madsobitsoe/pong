@@ -1,89 +1,7 @@
 import pygame
 import numpy as np
 from random import randint
-
-'''
-# Code to load png's
-def load_png(name):
-    # Load image and return image object
-    fullname = os.path.join('res', name)
-    try:
-        image = pygame.image.load(fullname)
-        if image.get_alpha() is None:
-            image = image.convert()
-        else:
-            image = image.convert_alpha()
-    except pygame.error, message:
-        print 'cannot load image:', fullname
-        raise SystemExit, message
-    return image, image.get_rect()
-'''
-
-# The neural network class
-
-class Neural_Network(object):
-    def __init__(self):
-        # Define Hyperparameters
-        self.inputLayerSize = 2
-        self.outputLayerSize = 1
-        self.hiddenLayerSize = 3
-
-        # Weights (parameters)
-        # Layer 1 weights
-        self.W1 = np.random.randn(self.inputLayerSize, self.hiddenLayerSize)
-
-        # Layer 2 weights
-        self.W2 = np.random.randn(self.hiddenLayerSize, self.outputLayerSize)
- 
-    def forward(self, X):
-        # Normalize 
-  #      X = X / np.amax(X, axis=0)
-#        print 'X is: ' + str(X)
-
-        # Propagate inputs through network
-        # Layer 2 activities
-        self.z2 = np.dot(X, self.W1)
-        # Layer 2 activations
-  #      print 'This is z2:'
-   #     print self.z2
-        self.a2 = self.sigmoid(self.z2)
-#        print 'This is a2:'
- #       print self.a2
-        # Layer 3 activations
-        # This is where the outputs of the hidden layer are squashed together
-        self.z3 = np.dot(self.a2, self.W2)
-        # Predicted score
-        # This runs the sigmoid activation function on z3 and saves it in yHat
-        yHat = self.sigmoid(self.z3)
-        return yHat
-
-            
-    def sigmoid(self, z):
-        # Apply sigmoid activation function
-        return 1 / (1 + np.exp(-z))
-
-
-
-class Player():
-    def __init__(self, width, height):
-        self.x = width - 100
-        self.y = height / 2
-        self.height = 80
-        self.width = 20
-
-    def draw(self, display_surf):
-        pygame.draw.rect(display_surf, (255, 255, 255), (self.x, self.y, self.width, self.height))
-        
-    def update(self, height):
-        coords = pygame.mouse.get_pos()
-        if coords[1] <= 0:
-            self.y = 0
-        if coords[1] >= height - self.height:
-            self.y = height - self.height
-        else:
-            self.y = coords[1]
-
-
+import neuralNet as nn;
 
 class NeuralNetPlayer():
     def __init__(self, width, height, neuralNet=None):
@@ -92,7 +10,7 @@ class NeuralNetPlayer():
         self.height = 80
         self.width = 20
         if neuralNet is None:
-            self.neuralNet = Neural_Network()
+            self.neuralNet = nn.Neural_Network()
         else:
             self.neuralNet = neuralNet
         
@@ -118,7 +36,7 @@ class NeuralNetPlayer():
         
         if self.y <= 0:
             self.y = 0
-            print 'fucccck'
+ 
         if self.y >= height - self.height:
             self.y = height - self.height - 5
         else:
@@ -257,9 +175,10 @@ class Main():
     def on_init(self):
         pygame.init()
         self.display_surf = pygame.display.set_mode(self.size)
-        pygame.display.set_caption('Pong clone')
+        pygame.display.set_caption('Pong with neural nets')
         self.running = True
         self.font = pygame.font.SysFont('Arial', 40)
+        self.weightsFont = pygame.font.SysFont('Arial', 10)
     def update_score(self):
         if self.ball.opponent_scored == True:
             self.opponent_points += 1 
@@ -269,13 +188,38 @@ class Main():
             self.ball.reset()
            
     def draw_score(self):
+        #setting up stuff to render
         score1 = self.font.render(str(self.opponent_points), True, (255, 255, 255))
         score2 = self.font.render(str(self.player_points), True, (255, 255, 255))
-        movetimer = self.font.render(str(self.opponent.move_timer), True, (255, 255, 255))
+        #movetimer = self.font.render(str(self.opponent.move_timer), True, (255, 255, 255))
+        print self.player.neuralNet.W1
+
+        w1 = 'Weights for first node: '
+        for weight in self.player.neuralNet.W1[0]:
+            w1 += format('%.4f, ' % weight)
+        w2 = 'Weights for second node: '
+        for weight in self.player.neuralNet.W1[1]:
+            w2 += format('%.4f, ' % weight)
+
+        w3 = 'Weights for second layer: '
+        for weight in self.player.neuralNet.W2:
+            w3 += format('%.4f, ' % weight)
+        
+
+        weights1 = self.weightsFont.render(w1, True, (255, 240, 240))
+        weights2 = self.weightsFont.render(w2, True, (255, 240, 240))
+        weights3 = self.weightsFont.render(w3, True, (255, 240, 240))
+
+        currentAction = self.weightsFont.render(format('Current Action: %.1f' % self.player.currentAction), True, (255,140,140))
+        # Actual blitting to display surface
         self.display_surf.blit(score1, (10, 10))
         self.display_surf.blit(score2, (600, 10))
-        self.display_surf.blit(movetimer, (10, 50))
-
+        # self.display_surf.blit(movetimer, (10, 50))
+        self.display_surf.blit(weights1, (400, 50))
+        self.display_surf.blit(weights2, (400, 65))
+        self.display_surf.blit(weights3, (400, 80))
+        self.display_surf.blit(currentAction, (400, 100))
+        
     def update_world(self):
         self.ball.check_bounds(self.width, self.height)
         self.ball.checkBat(self.opponent, self.player)
@@ -298,7 +242,7 @@ class Main():
         if self.on_init() == False:
             self.running = False
 #        self.player = Player(self.width, self.height)
-        self.player = NeuralNetPlayer(self.width, self.height, Neural_Network())
+        self.player = NeuralNetPlayer(self.width, self.height, nn.Neural_Network())
         self.opponent = Opponent(self.width, self.height)
         self.ball = Ball()
 
@@ -308,7 +252,7 @@ class Main():
                     pygame.QUIT()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        self.player.neuralNet = Neural_Network()
+                        self.player.neuralNet = nn.Neural_Network()
                         print 'new NN created for player'
                     if event.key == pygame.K_ESCAPE:
                         self.running = False

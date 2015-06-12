@@ -1,0 +1,9 @@
+A list of weights that seem to work well. Don't know if i'll use these for anything, since i want to evolve, not train. 
+
+Follows the ball pretty closely
+
+W1
+1.37706977, 1.87681487, 0.47602073
+-0.20270672, 0.92698164, 1.26720363
+W2
+1.25854931, -0.5789903, -0.20526494
