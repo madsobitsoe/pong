@@ -86,13 +86,16 @@ class Player():
 
 
 class NeuralNetPlayer():
-    def __init__(self, width, height, neuralNet):
+    def __init__(self, width, height, neuralNet=None):
         self.x = width - 100
         self.y = height / 2
         self.height = 80
         self.width = 20
-        self.neuralNet = neuralNet
-
+        if neuralNet is None:
+            self.neuralNet = Neural_Network()
+        else:
+            self.neuralNet = neuralNet
+        
         
         
         # The bat needs to go up, stay put or go down.
@@ -307,6 +310,8 @@ class Main():
                     if event.key == pygame.K_SPACE:
                         self.player.neuralNet = Neural_Network()
                         print 'new NN created for player'
+                    if event.key == pygame.K_ESCAPE:
+                        self.running = False
             self.update_world()
             self.render()
             
