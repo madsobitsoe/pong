@@ -151,7 +151,7 @@ class Ball():
                     self.y_speed += 0.4
             opponent.move_timer = randint(1, 50)
     # Check collision with opponent bat
-        if self.x - self.radius < opponent.x + opponent.width  and self.y + self.radius >= opponent.y and self.y - self.radius < opponent.y + opponent.height:
+        if self.x - self.radius < opponent.x + opponent.width  and self.x - self.radius > opponent.x and self.y + self.radius >= opponent.y and self.y - self.radius < opponent.y + opponent.height:
             self.x = opponent.x + opponent.width + self.radius
             self.x_speed = -self.x_speed
             if self.x_speed > 0:
@@ -164,7 +164,8 @@ class Ball():
         self.y += self.y_speed
 
 class Main():
-    def __init__(self):
+    def __init__(self, withGUI=True):
+        self.withGUI = withGUI
         self.running = True
         self.display_surf = None
         self.size = self.width, self.height = 640, 480
@@ -173,12 +174,14 @@ class Main():
         self.opponent_points = 0
         
     def on_init(self):
-        pygame.init()
-        self.display_surf = pygame.display.set_mode(self.size)
-        pygame.display.set_caption('Pong with neural nets')
+        if (self.withGUI):
+            pygame.init()
+            self.display_surf = pygame.display.set_mode(self.size)
+            pygame.display.set_caption('Pong with neural nets')
+            self.font = pygame.font.SysFont('Arial', 40)
+            self.weightsFont = pygame.font.SysFont('Arial', 10)
         self.running = True
-        self.font = pygame.font.SysFont('Arial', 40)
-        self.weightsFont = pygame.font.SysFont('Arial', 10)
+
     def update_score(self):
         if self.ball.opponent_scored == True:
             self.opponent_points += 1 
@@ -247,21 +250,23 @@ class Main():
         self.ball = Ball()
 
         while (self.running):
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.QUIT()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        self.player.neuralNet = nn.Neural_Network()
-                        print 'new NN created for player'
-                    if event.key == pygame.K_ESCAPE:
-                        self.running = False
+            if (self.withGUI):
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.QUIT()
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_SPACE:
+                            self.player.neuralNet = nn.Neural_Network()
+                            print 'new NN created for player'
+                        if event.key == pygame.K_ESCAPE:
+                            self.running = False
             self.update_world()
-            self.render()
+            if (self.withGUI):
+                self.render()
             
 
 
 
 if __name__ == '__main__' :
-    game = Main()
+    game = Main(True)
     game.on_execute()
