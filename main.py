@@ -2,7 +2,7 @@ import pygame
 import sys
 import numpy as np
 from random import randint
-import neuralNet as nn;
+import neuralNet as nn
 
 class NeuralNetPlayer():
     def __init__(self, width, height, neuralNet=None):
@@ -242,11 +242,14 @@ class Game():
         self.draw_score()
         pygame.display.flip()
         
-    def on_execute(self):
+    def on_execute(self, neuralNet=None):
         if self.on_init() == False:
             self.running = False
 #        self.player = Player(self.width, self.height)
-        self.player = NeuralNetPlayer(self.width, self.height, nn.Neural_Network())
+
+        if neuralNet==None:
+            neuralNet = nn.Neural_Network()
+        self.player = NeuralNetPlayer(self.width, self.height, neuralNet)
         self.opponent = Opponent(self.width, self.height)
         self.ball = Ball()
 
@@ -254,9 +257,9 @@ class Game():
             if (self.player_points == 5 or self.opponent_points == 5):
                 if (self.withGUI):
                     pygame.quit()
-                with open('output.txt', "a") as text_file:
-                    text_file.write('player points: ' + str(self.player_points) + ',')
-                    text_file.write('opponent points: ' + str(self.opponent_points)+ ',')
+#                with open('output.txt', "a") as text_file:
+#                   text_file.write('player points: ' + str(self.player_points) + ',')
+#                   text_file.write('opponent points: ' + str(self.opponent_points)+ ',')
                 return (self.player_points, self.opponent_points)
                 #return ('Player: ' + str(self.player_points) + '\nOpponent: ' + str( self.opponent_points))
             if (self.withGUI):
@@ -277,5 +280,5 @@ class Game():
 
 
 if __name__ == '__main__' :
-    game = Game(True)
+    game = Game(False)
     game.on_execute()
