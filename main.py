@@ -30,7 +30,7 @@ class NeuralNetPlayer():
 
         # Calculate action with network
         print ballY, ballX
-        print self.height
+        print self.y
         self.currentAction = self.neuralNet.forward(np.array(([ballY - self.y, ballX]), dtype=float)) 
         print 'Current action: ' + str(self.currentAction)
         

@@ -15,8 +15,9 @@ class Neural_Network(object):
         self.W2 = np.random.randn(self.hiddenLayerSize, self.outputLayerSize)
  
     def forward(self, X):
-        # Normalize 
-  #      X = X / np.amax(X, axis=0)
+        # Normalize
+
+ #       X = X / np.amax(X, axis=0)
 #        print 'X is: ' + str(X)
 
         # Propagate inputs through network

@@ -14,8 +14,8 @@ for x in range(5):
         playerPoints = game.on_execute(player)
         results.append("player " + str(players.index(player)) + '\nResult of game: ' + str(playerPoints))
         with open('players', 'a') as text_file:
-            text_file.write('Game number: '+ str(x) + '\n\n')
-            text_file.write('Player' + str(players.index(player)) + ':\n ')
+            text_file.write('Game number: '+ str(x + 1) + '\n\n')
+            text_file.write('Player' + str(players.index(player) + 1) + ':\n ')
             text_file.write('Weights 1:\n')
             for weight in player.W1:
                 text_file.write(str(weight) + '\n')
@@ -23,7 +23,15 @@ for x in range(5):
             for weight in player.W2:
                 text_file.write(str(weight) + '\n')
             text_file.write('Results from game: \n')
-            text_file.write('Player score: ' + str(playerPoints[0]) + '\n')
-            text_file.write('Opponent score: ' + str(playerPoints[1]) + '\n\n')                 
+            try:
+                print 'PlayerPoints is of type: ' + str(type(playerPoints))
+
+                text_file.write('Player score: ' + (str(playerPoints[0])) + '\n')
+                text_file.write('Opponent score: ' + str(playerPoints[1]) + '\n\n')
+            except TypeError:
+                print 'PlayerPoints is of type: ' + str(type(playerPoints))
+
+                text_file.write('Player score: No points, game was interrupted\n')
+                text_file.write('Opponent score: No points, game was interrupted\n\n')             
 for result in results:
     print result            
