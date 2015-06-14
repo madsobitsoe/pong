@@ -164,7 +164,7 @@ class Ball():
         self.x += self.x_speed
         self.y += self.y_speed
 
-class Main():
+class Game():
     def __init__(self, withGUI=True):
         self.withGUI = withGUI
         self.running = True
@@ -254,12 +254,11 @@ class Main():
             if (self.player_points == 5 or self.opponent_points == 5):
                 if (self.withGUI):
                     pygame.quit()
-                print 'player points: ' + str(self.player_points)
-                print 'opponent points: ' + str(self.opponent_points)
                 with open('output.txt', "a") as text_file:
                     text_file.write('player points: ' + str(self.player_points) + ',')
                     text_file.write('opponent points: ' + str(self.opponent_points)+ ',')
-                sys.exit()
+                return (self.player_points, self.opponent_points)
+                #return ('Player: ' + str(self.player_points) + '\nOpponent: ' + str( self.opponent_points))
             if (self.withGUI):
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -273,10 +272,10 @@ class Main():
             self.update_world()
             if (self.withGUI):
                 self.render()
-                
+        return self.player_points
 
 
 
 if __name__ == '__main__' :
-    game = Main(True)
+    game = Game(True)
     game.on_execute()
