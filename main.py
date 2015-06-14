@@ -1,4 +1,5 @@
 import pygame
+import sys
 import numpy as np
 from random import randint
 import neuralNet as nn;
@@ -250,10 +251,19 @@ class Main():
         self.ball = Ball()
 
         while (self.running):
+            if (self.player_points == 5 or self.opponent_points == 5):
+                if (self.withGUI):
+                    pygame.quit()
+                print 'player points: ' + str(self.player_points)
+                print 'opponent points: ' + str(self.opponent_points)
+                with open('output.txt', "a") as text_file:
+                    text_file.write('player points: ' + str(self.player_points) + ',')
+                    text_file.write('opponent points: ' + str(self.opponent_points)+ ',')
+                sys.exit()
             if (self.withGUI):
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
-                        pygame.QUIT()
+                        pygame.quit()
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_SPACE:
                             self.player.neuralNet = nn.Neural_Network()
@@ -263,7 +273,7 @@ class Main():
             self.update_world()
             if (self.withGUI):
                 self.render()
-            
+                
 
 
 
