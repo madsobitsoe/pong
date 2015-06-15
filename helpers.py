@@ -1,6 +1,6 @@
 # Helper functions for converting between floating point and integers
 import struct
-
+import random
 # http://stackoverflow.com/questions/14431170/get-the-bits-of-a-float-in-python
 def floatToBits(f):
     s = struct.pack('>f', f)
@@ -9,6 +9,33 @@ def floatToBits(f):
 def bitsToFloat(b):
     s = struct.pack('>l', b)
     return struct.unpack('>f', s)[0]
+
+def mutate(neuralNet):
+    print neuralNet.W1
+    print str(floatToBits(neuralNet.W1[0][0]))
+
+    binary = bin(floatToBits(neuralNet.W1[0][0]))
+    print binary
+    print str(type(binary))
+    index = random.randint(2,len(binary))
+
+    print 'Index is: ' + str(index)
+    
+    print 'The value is: ' + str(binary[index])
+    
+    if binary[index] == '1':
+        newBinary = binary[:index] + '0' + binary[index+1:]
+    else:
+        newBinary = binary[:index] + '1' + binary[index+1:]
+
+    print 'The changed value is: ' + str(newBinary[index])
+        
+    print newBinary
+
+    newFloat = bitsToFloat(int(newBinary, 2))
+    print newFloat
+    
+    
 
 
 #def binary(num):

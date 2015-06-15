@@ -1,6 +1,6 @@
 import main
 import neuralNet as nn
-
+import helpers
 players = []
 results = []
 
@@ -8,7 +8,7 @@ results = []
 for x in range(5):
     players.append(nn.Neural_Network())
 # Play 5 games with each player
-for x in range(5):
+for x in range(1):
     for player in players:
         game = main.Game(False)
         playerPoints = game.on_execute(player)
@@ -35,3 +35,8 @@ for x in range(5):
                 text_file.write('Opponent score: No points, game was interrupted\n\n')             
 for result in results:
     print result            
+
+helpers.mutate(players[0])
+
+
+    
