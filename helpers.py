@@ -11,7 +11,13 @@ def bitsToFloat(b):
     return struct.unpack('>f', s)[0]
 
 def mutate(neuralNet):
-    print neuralNet.W1
+    # For each weight, check to see if weight should mutate, and mutate if so
+    for net in neuralNet.W1:
+        for weight in net:
+            print 'Value as float is: ' + str(weight)
+            print 'Value as int is: ' + str(floatToBits(weight))
+            print 'Value as bits is: ' + bin(floatToBits(weight))
+    
     print str(floatToBits(neuralNet.W1[0][0]))
 
     binary = bin(floatToBits(neuralNet.W1[0][0]))
